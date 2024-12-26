@@ -106,11 +106,11 @@ class DyoController extends Controller
         return new DyoResource('success', 'Dyo created successfully', $data);
     }
 
-    public function updateStatus($id, Request $request)
+    public function update(Request $request, $id)
     {
         // Validasi input status
         $validator = Validator::make($request->all(), [
-            'status' => 'required|integer|in:0,1', // misalnya status hanya bisa 0 atau 1
+            'status' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -126,12 +126,7 @@ class DyoController extends Controller
         }
 
         // Update status Dyo
-        $dyo->status = $request->status;
-        $dyo->save(); // Simpan perubahan
-
-        return response()->json([
-            'message' => 'Dyo status updated successfully!',
-            'dyo' => $dyo
-        ]);
+        $dyo->update(['status' => $request->status]);
+        return new DyoResource("success", "Dyo status updated", $dyo);
     }
 }

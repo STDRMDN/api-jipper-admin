@@ -65,11 +65,11 @@ class WholesaleController extends Controller
         return new DyoResource('success', 'Data Wholesale Berhasil Ditambahkan!', $wholesale);
     }
 
-    public function updateStatus($id, Request $request)
+    public function updateStatus(Request $request, $id)
     {
         // Validasi input status
         $validator = Validator::make($request->all(), [
-            'status' => 'required|integer|in:0,1,2', // Misalnya status bisa 0, 1, atau 2
+            'status' => 'required|integer',
         ]);
 
         // Jika validasi gagal
@@ -86,12 +86,8 @@ class WholesaleController extends Controller
         }
 
         // Update status wholesale
-        $wholesale->status = $request->status;
-        $wholesale->save(); // Simpan perubahan
+        $wholesale->update(['status' => $request->status]);
 
-        return response()->json([
-            'message' => 'Wholesale status updated successfully!',
-            'wholesale' => $wholesale
-        ]);
+        return new DyoResource("success", "Wholesale status Updated", $id);
     }
 }

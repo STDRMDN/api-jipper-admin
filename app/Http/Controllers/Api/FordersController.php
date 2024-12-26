@@ -95,11 +95,11 @@ class FordersController extends Controller
         return new DyoResource(true, 'Order berhasil dibuat!', $forders);
     }
 
-    public function updateStatus($id, Request $request)
+    public function update(Request $request, $id)
     {
         // Validasi input status
         $validator = Validator::make($request->all(), [
-            'status' => 'required|integer|in:0,1,2,3', // Misalnya status bisa 0, 1, 2, 3
+            'status' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -115,12 +115,7 @@ class FordersController extends Controller
         }
 
         // Update status order
-        $forder->status = $request->status;
-        $forder->save(); // Simpan perubahan status
-
-        return response()->json([
-            'message' => 'Order status updated successfully!',
-            'forder' => $forder
-        ]);
+        $forder->update(['status' => $request->status]);
+        return new DyoResource("success", "Order status updated", $forder);
     }
 }

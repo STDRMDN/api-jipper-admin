@@ -34,10 +34,9 @@ Route::apiResource('/checkout', App\Http\Controllers\Api\CheckoutController::cla
 
 // Update status order
 Route::apiResource('/checkout', App\Http\Controllers\Api\CheckoutController::class);
-
-Route::put('/dyos/{id}/status', [App\Http\Controllers\Api\DyoController::class, 'updateStatus']);
-Route::put('/orders/{id}/status', [App\Http\Controllers\Api\FordersController::class, 'updateStatus']);
-Route::put('/wholesale/{id}/status', [App\Http\Controllers\Api\WholesaleController::class, 'updateStatus']);
+Route::apiResource('/dyos', App\Http\Controllers\Api\DyoController::class);
+Route::apiResource('/orders', App\Http\Controllers\Api\FordersController::class);
+Route::apiResource('/wholesale', App\Http\Controllers\Api\WholesaleController::class);
 
 // Simple route for product
 Route::get('/product', function () {
