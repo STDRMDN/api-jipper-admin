@@ -57,7 +57,7 @@ class CheckoutController extends Controller
         }
 
         $order = Order::create([
-            'status' => 0,
+            'status' => 1,
             'email' => $request->email,
             'country' => $request->country,
             'name' => $request->name,
@@ -93,5 +93,31 @@ class CheckoutController extends Controller
 
 
         return new DyoResource("success", "order created", Order::with('productOrders')->find($order->id));
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|integer', // Validasi untuk status
+        ]);
+
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
+
+        // Cari order berdasarkan id
+        $order = Order::find($id);
+
+        // Jika order tidak ditemukan, kembalikan response error
+        if (!$order) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+
+        // Update status order
+        $order->status = $request->status;
+        $order->save();
+
+        // Kembalikan response dengan data terbaru
+        return new DyoResource("success", "Order status updated", Order::with('productOrders')->find($order->id));
     }
 }

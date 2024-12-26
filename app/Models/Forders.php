@@ -25,6 +25,7 @@ class Forders extends Model
         'jersey_size_chart',
         'custom_jersey_size',
         'rush_shipping',
+        'status',
     ];
 
     protected $casts = [

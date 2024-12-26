@@ -65,6 +65,7 @@ class FordersController extends Controller
             'jersey_material' => $request->jersey_material,
             'jersey_size_chart' => $request->jersey_size_chart,
             'rush_shipping' => $request->rush_shipping,
+            'status' => 1,
         ]);
 
         // Handle attachments
@@ -92,5 +93,34 @@ class FordersController extends Controller
         $forders->save();
 
         return new DyoResource(true, 'Order berhasil dibuat!', $forders);
+    }
+
+    public function updateStatus($id, Request $request)
+    {
+        // Validasi input status
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|integer|in:0,1,2,3', // Misalnya status bisa 0, 1, 2, 3
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()->all()], 422);
+        }
+
+        // Cari order berdasarkan ID
+        $forder = Forders::find($id);
+
+        // Jika order tidak ditemukan, return error
+        if (!$forder) {
+            return response()->json(['error' => 'Order not found!'], 404);
+        }
+
+        // Update status order
+        $forder->status = $request->status;
+        $forder->save(); // Simpan perubahan status
+
+        return response()->json([
+            'message' => 'Order status updated successfully!',
+            'forder' => $forder
+        ]);
     }
 }

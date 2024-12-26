@@ -58,9 +58,40 @@ class WholesaleController extends Controller
             'country'      => $request->country,
             'phone_number' => $request->phone_number,
             'email'        => $request->email,
+            'status' => 1,
         ]);
 
         // Return data yang berhasil disimpan dengan resource
         return new DyoResource('success', 'Data Wholesale Berhasil Ditambahkan!', $wholesale);
+    }
+
+    public function updateStatus($id, Request $request)
+    {
+        // Validasi input status
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|integer|in:0,1,2', // Misalnya status bisa 0, 1, atau 2
+        ]);
+
+        // Jika validasi gagal
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()->all()], 422);
+        }
+
+        // Cari wholesale berdasarkan ID
+        $wholesale = Wholesale::find($id);
+
+        // Jika data wholesale tidak ditemukan
+        if (!$wholesale) {
+            return response()->json(['error' => 'Wholesale not found!'], 404);
+        }
+
+        // Update status wholesale
+        $wholesale->status = $request->status;
+        $wholesale->save(); // Simpan perubahan
+
+        return response()->json([
+            'message' => 'Wholesale status updated successfully!',
+            'wholesale' => $wholesale
+        ]);
     }
 }

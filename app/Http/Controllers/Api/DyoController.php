@@ -64,7 +64,8 @@ class DyoController extends Controller
             'team' => $request->team,
             'phone' => $request->phone,
             'id_ref' => $request->id_ref,
-            'description' => $request->description
+            'description' => $request->description,
+            'status' => 1,
         ]);
 
         // tambah attachmet
@@ -103,5 +104,34 @@ class DyoController extends Controller
         ];
 
         return new DyoResource('success', 'Dyo created successfully', $data);
+    }
+
+    public function updateStatus($id, Request $request)
+    {
+        // Validasi input status
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|integer|in:0,1', // misalnya status hanya bisa 0 atau 1
+        ]);
+
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
+
+        // Cari Dyo berdasarkan ID
+        $dyo = Dyo::find($id);
+
+        // Jika Dyo tidak ditemukan, return error
+        if (!$dyo) {
+            return response()->json(['error' => 'Dyo not found!'], 404);
+        }
+
+        // Update status Dyo
+        $dyo->status = $request->status;
+        $dyo->save(); // Simpan perubahan
+
+        return response()->json([
+            'message' => 'Dyo status updated successfully!',
+            'dyo' => $dyo
+        ]);
     }
 }

@@ -19,6 +19,7 @@ class Wholesale extends Model
         'country',
         'phone_number',
         'email',
+        'status',
     ];
 
     public $timestamps = true;

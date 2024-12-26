@@ -9,7 +9,7 @@ class Dyo extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['team', 'name', 'phone', 'email', 'id_ref', 'description'];
+    protected $fillable = ['team', 'name', 'phone', 'email', 'id_ref', 'description', 'status'];
 
     public function attachments()
     {
