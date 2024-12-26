@@ -29,6 +29,8 @@ Route::apiResource('/dyos', App\Http\Controllers\Api\DyoController::class);
 Route::apiResource('/orders', App\Http\Controllers\Api\FordersController::class);
 Route::apiResource('/payment-approval', App\Http\Controllers\Api\PaymentApprovalController::class);
 Route::apiResource('/wholesale', App\Http\Controllers\Api\WholesaleController::class);
+Route::apiResource('/message', App\Http\Controllers\Api\MessageController::class);
+Route::apiResource('/checkout', App\Http\Controllers\Api\CheckoutController::class);
 
 Route::get('/product', function () {
     return response(['product' => 'Jipper'], 200);
