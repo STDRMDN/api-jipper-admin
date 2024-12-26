@@ -95,29 +95,29 @@ class CheckoutController extends Controller
         return new DyoResource("success", "order created", Order::with('productOrders')->find($order->id));
     }
 
-    public function updateStatus(Request $request, $id)
+    public function update(Request $request, $id)
     {
+        // Validasi input
         $validator = Validator::make($request->all(), [
-            'status' => 'required|integer', // Validasi untuk status
+            'status' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()->all()], 422);
         }
 
-        // Cari order berdasarkan id
+        // Cari order berdasarkan ID
         $order = Order::find($id);
 
-        // Jika order tidak ditemukan, kembalikan response error
+        // Jika tidak ditemukan, kembalikan respons 404
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
         }
 
-        // Update status order
-        $order->status = $request->status;
-        $order->save();
+        // Update status
+        $order->update(['status' => $request->status]);
 
-        // Kembalikan response dengan data terbaru
-        return new DyoResource("success", "Order status updated", Order::with('productOrders')->find($order->id));
+        // Kembalikan respons dengan data terbaru
+        return new DyoResource("success", "Order status updated", $order);
     }
 }
