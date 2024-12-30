@@ -15,4 +15,9 @@ class Order extends Model
     {
         return $this->hasMany(ProductOrder::class, 'id_order');
     }
+
+    public function payment()
+    {
+        return $this->hasOne(PaymentApproval::class, 'id_order');
+    }
 }

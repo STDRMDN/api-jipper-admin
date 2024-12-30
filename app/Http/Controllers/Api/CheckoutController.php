@@ -17,13 +17,13 @@ class CheckoutController extends Controller
 {
     public function index()
     {
-        $data = Order::with('productOrders')->latest()->simplePaginate(10);
+        $data = Order::with(['productOrders', 'payment'])->latest()->simplePaginate(10);
         return new DyoResource("success", "get all orders", $data);
     }
 
     public function show($id)
     {
-        $order = Order::with('productOrders')->find($id);
+        $order = Order::with(['productOrders', 'payment'])->find($id);
 
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
