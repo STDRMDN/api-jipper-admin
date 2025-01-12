@@ -48,3 +48,19 @@ Route::get('/product', function () {
  * @method "POST"
  */
 Route::post('/logout', App\Http\Controllers\Api\LogoutController::class)->name('logout');
+
+// Tambahkan route untuk category dan product
+
+// Category routes
+Route::post('/categories', [App\Http\Controllers\CategoryController::class, 'store']);
+Route::put('/categories/{id}', [App\Http\Controllers\CategoryController::class, 'update']);
+Route::delete('/categories/{id}', [App\Http\Controllers\CategoryController::class, 'destroy']);
+Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index']);
+
+// Product routes
+Route::post('/products', [App\Http\Controllers\ProductController::class, 'store']);
+Route::get('/products', [App\Http\Controllers\ProductController::class, 'index']);
+Route::get('/products/category/{categoryId}', [App\Http\Controllers\ProductController::class, 'getByCategory']);
+Route::get('/products/{id}', [App\Http\Controllers\ProductController::class, 'show']);
+Route::put('/products/{id}', [App\Http\Controllers\ProductController::class, 'update']);
+Route::delete('/products/{id}', [App\Http\Controllers\ProductController::class, 'destroy']);
