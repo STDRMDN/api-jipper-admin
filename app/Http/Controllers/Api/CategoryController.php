@@ -25,17 +25,25 @@ class CategoryController extends Controller
     // 2. PUT category
     public function update(Request $request, $id)
     {
+        // Cari kategori berdasarkan ID, jika tidak ditemukan akan return 404
         $category = Category::findOrFail($id);
 
-        $request->validate([
+        // Validasi input
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:categories,slug,' . $id,
+            'slug' => 'required|string|max:255|unique:categories,slug,' . $id, // Memastikan slug unik, kecuali untuk ID ini
         ]);
 
-        $category->update($request->all());
+        // Update kategori dengan data yang sudah divalidasi
+        $category->update($validatedData);
 
-        return response()->json(['message' => 'Category updated successfully', 'data' => $category], 200);
+        // Return response sukses
+        return response()->json([
+            'message' => 'Category updated successfully',
+            'data' => $category
+        ], 200);
     }
+
 
     // 3. DELETE category
     public function destroy($id)
