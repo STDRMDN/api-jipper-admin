@@ -54,6 +54,7 @@ class CategoryController extends Controller
     // 4. GET categories
     public function index()
     {
+        $categories = Category::latest()->simplePaginate(10);
         $categories = Category::all();
         $totalCategories = $categories->count();
 

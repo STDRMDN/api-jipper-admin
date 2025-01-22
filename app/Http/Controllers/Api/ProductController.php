@@ -10,7 +10,6 @@ use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
-    // 5. POST product
     public function store(Request $request)
     {
         $request->validate([
@@ -28,12 +27,16 @@ class ProductController extends Controller
 
         $productSlug = $categorySlug . '-' . ($productCount + 1);
 
+        // Upload image front dan back ke storage/app/public/product
+        $frontPath = $request->file('front')->store('product', 'public');
+        $backPath = $request->file('back')->store('product', 'public');
+
         $product = Product::create([
             'cat_id' => $request->cat_id,
             'name' => $request->name,
             'slug' => $productSlug,
-            'front' => $request->file('front')->store('products/front'), // Upload image front
-            'back' => $request->file('back')->store('products/back'), // Upload image back
+            'front' => $frontPath, // Simpan path ke dalam database
+            'back' => $backPath,   // Simpan path ke dalam database
             'price' => $request->price,
         ]);
 
@@ -73,7 +76,6 @@ class ProductController extends Controller
         return response()->json(['data' => $product], 200);
     }
 
-    // 9. PUT product by id
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -87,16 +89,21 @@ class ProductController extends Controller
             'price' => 'required|numeric',
         ]);
 
+        // Update data produk
         $product->update($request->all());
 
         // Handle image uploads
         if ($request->hasFile('front')) {
-            $product->front = $request->file('front')->store('products');
+            $frontPath = $request->file('front')->store('product', 'public');
+            $product->front = $frontPath;
         }
 
         if ($request->hasFile('back')) {
-            $product->back = $request->file('back')->store('products');
+            $backPath = $request->file('back')->store('product', 'public');
+            $product->back = $backPath;
         }
+
+        $product->save();
 
         return response()->json(['message' => 'Product updated successfully', 'data' => $product], 200);
     }
