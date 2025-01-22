@@ -27,21 +27,22 @@ class ProductController extends Controller
 
         $productSlug = $categorySlug . '-' . ($productCount + 1);
 
-        // Upload image front dan back ke storage/app/public/product
-        $frontPath = $request->file('front')->store('product', 'public');
-        $backPath = $request->file('back')->store('product', 'public');
+        // Store the front and back images in their respective directories
+        $frontPath = $request->file('front')->store('product/front', 'public');
+        $backPath = $request->file('back')->store('product/back', 'public');
 
         $product = Product::create([
             'cat_id' => $request->cat_id,
             'name' => $request->name,
             'slug' => $productSlug,
-            'front' => $frontPath, // Simpan path ke dalam database
-            'back' => $backPath,   // Simpan path ke dalam database
+            'front' => $frontPath, // Save the path to the database
+            'back' => $backPath,   // Save the path to the database
             'price' => $request->price,
         ]);
 
         return response()->json($product, 201);
     }
+
 
 
     // 6. GET Product all
@@ -89,17 +90,17 @@ class ProductController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        // Update data produk
+        // Update product data
         $product->update($request->all());
 
-        // Handle image uploads
+        // Handle image uploads if present
         if ($request->hasFile('front')) {
-            $frontPath = $request->file('front')->store('product', 'public');
+            $frontPath = $request->file('front')->store('product/front', 'public');
             $product->front = $frontPath;
         }
 
         if ($request->hasFile('back')) {
-            $backPath = $request->file('back')->store('product', 'public');
+            $backPath = $request->file('back')->store('product/back', 'public');
             $product->back = $backPath;
         }
 
@@ -107,6 +108,7 @@ class ProductController extends Controller
 
         return response()->json(['message' => 'Product updated successfully', 'data' => $product], 200);
     }
+
 
     // 10. DELETE product by id
     public function destroy($id)
