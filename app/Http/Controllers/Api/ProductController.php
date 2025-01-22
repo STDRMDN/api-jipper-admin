@@ -13,7 +13,6 @@ class ProductController extends Controller
     // 5. POST product
     public function store(Request $request)
     {
-        // Validasi input produk
         $request->validate([
             'cat_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
@@ -22,17 +21,13 @@ class ProductController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        // Ambil slug dari kategori yang dipilih
         $category = Category::find($request->cat_id);
         $categorySlug = $category->slug;
 
-        // Hitung jumlah produk yang sudah ada dalam kategori tersebut
         $productCount = Product::where('cat_id', $request->cat_id)->count();
 
-        // Buat slug produk dengan format "{slug category}-{increment}"
         $productSlug = $categorySlug . '-' . ($productCount + 1);
 
-        // Simpan produk baru
         $product = Product::create([
             'cat_id' => $request->cat_id,
             'name' => $request->name,
@@ -49,16 +44,23 @@ class ProductController extends Controller
     // 6. GET Product all
     public function index()
     {
-        $products = Product::with('category')->get();
+        $products = Product::with('category')->paginate(10);
 
-        return response()->json(['data' => $products], 200);
+        return response()->json([
+            'message' => 'Products retrieved successfully',
+            'total' => $products->total(),
+            'current_page' => $products->currentPage(),
+            'data' => $products->items()
+        ], 200);
     }
+
+
 
     // 7. GET product by category
     public function getByCategory($categoryId)
     {
         $category = Category::findOrFail($categoryId);
-        $products = $category->products; // Relasi dengan produk
+        $products = $category->products;
 
         return response()->json(['data' => $products], 200);
     }

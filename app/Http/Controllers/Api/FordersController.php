@@ -14,8 +14,13 @@ class FordersController extends Controller
     public function index()
     {
         $forders = Forders::latest()->paginate(10);
-        return new DyoResource("success", 'List Data Orders', $forders);
+        $totalForders = Forders::count();  // Mendapatkan total semua data Forders
+
+        return (new DyoResource("success", 'List Data Orders', $forders))->additional([
+            'total' => $totalForders
+        ]);
     }
+
 
     public function show($id)
     {

@@ -7,16 +7,18 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class DyoResource extends JsonResource
 {
-    // define properties
+    // Define properties
     public $status;
     public $message;
     public $resource;
+    public $total;  // Add property for total
 
-    public function __construct($status, $message, $resource)
+    public function __construct($status, $message, $resource, $total = null)
     {
         parent::__construct($resource);
         $this->status  = $status;
         $this->message = $message;
+        $this->total   = $total;  // Set the total property if provided
     }
 
     /**
@@ -26,10 +28,18 @@ class DyoResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        // Check if total is set (used for paginated data)
+        $response = [
             'status'  => $this->status,
             'message' => $this->message,
-            'data'    => $this->resource
+            'data'    => $this->resource,
         ];
+
+        // Include total if available (used in case of paginated data)
+        if ($this->total !== null) {
+            $response['total'] = $this->total;
+        }
+
+        return $response;
     }
 }

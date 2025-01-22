@@ -6,6 +6,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DyoResource;
 
 class CategoryController extends Controller
 {
@@ -19,7 +20,7 @@ class CategoryController extends Controller
 
         $category = Category::create($request->all());
 
-        return response()->json(['message' => 'Category created successfully', 'data' => $category], 201);
+        return new DyoResource("success", "Category created successfully", $category);
     }
 
     // 2. PUT category
@@ -38,12 +39,8 @@ class CategoryController extends Controller
         $category->update($validatedData);
 
         // Return response sukses
-        return response()->json([
-            'message' => 'Category updated successfully',
-            'data' => $category
-        ], 200);
+        return new DyoResource("success", "Category updated successfully", $category);
     }
-
 
     // 3. DELETE category
     public function destroy($id)
@@ -51,19 +48,18 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->delete();
 
-        return response()->json(['message' => 'Category deleted successfully'], 200);
+        return new DyoResource("success", "Category deleted successfully", null);
     }
 
-    // 4. GET category
+    // 4. GET categories
     public function index()
     {
         $categories = Category::all();
         $totalCategories = $categories->count();
 
-        return response()->json([
-            'message' => 'categories retrivied successfully',
+        return new DyoResource("success", "Categories retrieved successfully", [
             'total' => $totalCategories,
-            'data' => $categories
-        ], 200);
+            'categories' => $categories
+        ]);
     }
 }

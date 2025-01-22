@@ -18,8 +18,13 @@ class DyoController extends Controller
     public function index()
     {
         $dyo = Dyo::with('attachments', 'attachmentRefs')->latest()->simplePaginate(10);
-        return new DyoResource("success", "get all dyo", $dyo);
+        $totalDyo = Dyo::count();
+
+        return (new DyoResource("success", "get all dyo", $dyo))->additional([
+            'total' => $totalDyo
+        ]);
     }
+
 
 
 

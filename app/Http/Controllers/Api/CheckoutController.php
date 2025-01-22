@@ -17,20 +17,22 @@ class CheckoutController extends Controller
 {
     public function index()
     {
-        $data = Order::with(['productOrders', 'payment'])->latest()->simplePaginate(10);
-        return new DyoResource("success", "get all orders", $data);
+
+        $data = Order::with(['productOrders', 'payment'])->latest()->paginate(10);
+
+        return new DyoResource("success", "get all orders", $data, $data->total());
     }
+
+
 
     public function show($id)
     {
-        $order = Order::with(['productOrders', 'payment'])->find($id);
+        $order = Order::with(['productOrders', 'payment'])->findOrFail($id);
 
-        if (!$order) {
-            return response()->json(['error' => 'Order not found'], 404);
-        }
-
-        return new DyoResource("success", "get order by id", $order);
+        // Resource tanpa total data
+        return new DyoResource("success", "Order details", $order);
     }
+
 
     public function store(Request $request)
     {

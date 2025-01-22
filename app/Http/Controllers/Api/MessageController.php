@@ -15,9 +15,14 @@ class MessageController extends Controller
      */
     public function index()
     {
-        $messages = Messages::latest()->paginate(10);
-        return new DyoResource("success", 'List Data Messages', $messages);
+        $messages = Messages::latest()->paginate(10);  // Data yang dipaginate
+        $totalMessages = Messages::count();  // Mendapatkan total semua data Messages
+
+        return (new DyoResource("success", 'List Data Messages', $messages))->additional([
+            'total' => $totalMessages
+        ]);
     }
+
 
     public function show($id)
     {

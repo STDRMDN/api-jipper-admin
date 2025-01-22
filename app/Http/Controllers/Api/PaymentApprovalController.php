@@ -13,10 +13,14 @@ class PaymentApprovalController extends Controller
 {
     public function index()
     {
-        return DyoResource::collection(
-            PaymentApproval::query()->paginate(10)
-        );
+        $paymentApprovals = PaymentApproval::paginate(10);  // Data yang dipaginate
+        $totalPaymentApprovals = PaymentApproval::count();  // Mendapatkan total seluruh data PaymentApproval
+
+        return DyoResource::collection($paymentApprovals)->additional([
+            'total' => $totalPaymentApprovals
+        ]);
     }
+
 
     public function show($id)
     {
