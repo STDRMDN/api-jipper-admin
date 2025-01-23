@@ -55,7 +55,6 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::latest()->simplePaginate(10);
-        $categories = Category::all();
         $totalCategories = $categories->count();
 
         return new DyoResource("success", "Categories retrieved successfully", [
