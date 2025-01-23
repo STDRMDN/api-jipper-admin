@@ -54,12 +54,15 @@ class CategoryController extends Controller
     // 4. GET categories
     public function index()
     {
-        $categories = Category::latest()->simplePaginate(10);
-        $totalCategories = $categories->count();
+        // Mendapatkan semua data kategori dengan pagination
+        $categories = Category::latest()->paginate(10);
+
+        // Mendapatkan total seluruh data dalam tabel tanpa terpengaruh pagination
+        $totalCategories = Category::count();
 
         return new DyoResource("success", "Categories retrieved successfully", [
-            'total' => $totalCategories,
-            'categories' => $categories
+            'total' => $totalCategories, // Total seluruh kategori
+            'categories' => $categories  // Kategori yang dipaginate
         ]);
     }
 }
