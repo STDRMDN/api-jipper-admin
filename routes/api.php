@@ -32,7 +32,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 // API Resources without JWT for GET requests only
-Route::get('/dyos/{id}', [App\Http\Controllers\Api\CategoryController::class, 'show']);
+Route::get('/dyos/{id}', [App\Http\Controllers\Api\DyoController::class, 'show']);
 Route::get('/dyos', [App\Http\Controllers\Api\DyoController::class, 'index']);
 Route::get('/orders/{id}', [App\Http\Controllers\Api\FordersController::class, 'show']);
 Route::get('/orders', [App\Http\Controllers\Api\FordersController::class, 'index']);
