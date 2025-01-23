@@ -48,6 +48,9 @@ Route::get('/categories', [App\Http\Controllers\Api\CategoryController::class, '
 Route::get('/products', [App\Http\Controllers\Api\ProductController::class, 'index']);
 Route::get('/products/category/{categoryId}', [App\Http\Controllers\Api\ProductController::class, 'getByCategory']);
 Route::get('/products/{id}', [App\Http\Controllers\Api\ProductController::class, 'show']);
+Route::get('/product-images/product/{productId}', [App\Http\Controllers\Api\ProductImageController::class, 'getByProduct']);
+Route::get('/product-images/{id}', [App\Http\Controllers\Api\ProductImageController::class, 'show']);
+
 
 /**
  * Simple route for product (GET only, no JWT required)
@@ -89,4 +92,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/products', [App\Http\Controllers\Api\ProductController::class, 'store']);
     Route::put('/products/{id}', [App\Http\Controllers\Api\ProductController::class, 'update']);
     Route::delete('/products/{id}', [App\Http\Controllers\Api\ProductController::class, 'destroy']);
+
+    //productimages routes
+    Route::post('/product-images', [App\Http\Controllers\Api\ProductImageController::class, 'store']);
+    Route::delete('/product-images/{id}', [App\Http\Controllers\Api\ProductImageController::class, 'destroy']);
 });
