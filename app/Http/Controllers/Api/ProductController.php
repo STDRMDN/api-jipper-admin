@@ -79,35 +79,41 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Temukan produk berdasarkan ID
         $product = Product::findOrFail($id);
 
+        // Validasi data yang diinput
         $request->validate([
-            'cat_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:products,slug,' . $id,
-            'front' => 'nullable|image',
-            'back' => 'nullable|image',
-            'price' => 'required|numeric',
+            'cat_id' => 'required|exists:categories,id', // Pastikan kategori ada
+            'name' => 'required|string|max:255',        // Nama produk wajib diisi
+            'slug' => 'required|string|max:255|unique:products,slug,' . $id, // Slug harus unik kecuali untuk produk ini
+            'front' => 'nullable|image',                // Front bisa kosong dan harus berupa gambar
+            'back' => 'nullable|image',                 // Back bisa kosong dan harus berupa gambar
+            'price' => 'required|numeric',              // Harga wajib diisi dan harus angka
         ]);
 
-        // Update product data
-        $product->update($request->all());
+        // Perbarui data produk, kecuali field yang kosong
+        $product->fill($request->except(['front', 'back']));
 
-        // Handle image uploads if present
+        // Jika ada file gambar 'front', simpan file
         if ($request->hasFile('front')) {
             $frontPath = $request->file('front')->store('product/front', 'public');
             $product->front = $frontPath;
         }
 
+        // Jika ada file gambar 'back', simpan file
         if ($request->hasFile('back')) {
             $backPath = $request->file('back')->store('product/back', 'public');
             $product->back = $backPath;
         }
 
+        // Simpan perubahan produk
         $product->save();
 
-        return response()->json(['message' => 'Product updated successfully', 'data' => $product], 200);
+        // Kembalikan respons JSON sukses
+        return response()->json(['message' => 'Produk berhasil diperbarui', 'data' => $product], 200);
     }
+
 
 
     // 10. DELETE product by id
