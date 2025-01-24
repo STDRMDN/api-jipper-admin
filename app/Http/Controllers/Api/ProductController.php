@@ -79,11 +79,8 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Temukan produk berdasarkan ID
-        $product = Product::findOrFail($id);
-
-        // Validasi data yang diinput (semua menjadi nullable)
-        $request->validate([
+        // Validasi input
+        $validator = Validator::make($request->all(), [
             'cat_id' => 'nullable|exists:categories,id',
             'name' => 'nullable|string|max:255',
             'slug' => 'nullable|string|max:255|unique:products,slug,' . $id,
@@ -92,41 +89,37 @@ class ProductController extends Controller
             'price' => 'nullable|numeric',
         ]);
 
-        // Perbarui data produk hanya jika field diisi
-        if ($request->filled('cat_id')) {
-            $product->cat_id = $request->cat_id;
-        }
-        if ($request->filled('name')) {
-            $product->name = $request->name;
-        }
-        if ($request->filled('slug')) {
-            $product->slug = $request->slug;
-        }
-        if ($request->filled('price')) {
-            $product->price = $request->price;
+        // Jika validasi gagal
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()->all()], 422);
         }
 
-        // Jika ada file gambar 'front', simpan file
+        // Cari produk berdasarkan ID
+        $product = Product::find($id);
+
+        // Jika data produk tidak ditemukan
+        if (!$product) {
+            return response()->json(['error' => 'Product not found!'], 404);
+        }
+
+        // Siapkan data untuk diupdate
+        $updateData = $request->only(['cat_id', 'name', 'slug', 'price']);
+
+        // Simpan file gambar jika ada
         if ($request->hasFile('front')) {
-            $frontPath = $request->file('front')->store('product/front', 'public');
-            $product->front = $frontPath;
+            $updateData['front'] = $request->file('front')->store('product/front', 'public');
         }
-
-        // Jika ada file gambar 'back', simpan file
         if ($request->hasFile('back')) {
-            $backPath = $request->file('back')->store('product/back', 'public');
-            $product->back = $backPath;
+            $updateData['back'] = $request->file('back')->store('product/back', 'public');
         }
 
-        // Simpan perubahan produk
-        $product->save();
+        // Update produk
+        $product->update($updateData);
 
-        // Kembalikan respons JSON sukses dengan data terbaru
-        return response()->json([
-            'message' => 'Produk berhasil diperbarui',
-            'data' => $product->fresh() // Mengambil data terbaru dari database
-        ], 200);
+        // Kembalikan respons JSON sukses
+        return new DyoResource("success", "Product updated successfully", $product);
     }
+
 
 
 
