@@ -83,15 +83,11 @@ class ProductController extends Controller
     {
         // Define validation rules
         $validator = Validator::make($request->all(), [
-            'cat_id' => 'nullable|exists:categories,id', // Tidak wajib, tetapi harus valid jika diisi
-            'name'   => 'nullable|string|max:255',
-            'slug'   => 'nullable|string|unique:products,slug,' . $id, // Tidak wajib, unik jika diisi
-            'price'  => 'nullable|numeric|min:0',
-            'front'  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'back'   => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'cat_id' => 'required', // Tidak wajib, tetapi harus valid jika diisi
+            'name'   => 'required',
+            'slug'   => 'required|unique:products,slug,' . $id, // Unik jika diisi, kecuali untuk ID yang sama
+            'price'  => 'required',
         ]);
-
-
 
         // Check if validation fails
         if ($validator->fails()) {
@@ -136,12 +132,13 @@ class ProductController extends Controller
         }
 
         // Update other fields
-        $product->update([
-            'cat_id' => $request->cat_id ?? $product->cat_id,
-            'name'   => $request->name ?? $product->name,
-            'slug'   => $request->slug ?? $product->slug,
-            'price'  => $request->price ?? $product->price,
-        ]);
+        $product->cat_id = $request->cat_id ?? $product->cat_id;
+        $product->name   = $request->name ?? $product->name;
+        $product->slug   = $request->slug ?? $product->slug;
+        $product->price  = $request->price ?? $product->price;
+
+        // Save the updated product
+        $product->save();
 
         // Return response
         return response()->json([
@@ -150,6 +147,7 @@ class ProductController extends Controller
             'data'    => $product,
         ], 200);
     }
+
 
 
     // 10. DELETE product by id
