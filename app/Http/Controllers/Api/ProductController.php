@@ -82,7 +82,7 @@ class ProductController extends Controller
         // Temukan produk berdasarkan ID
         $product = Product::findOrFail($id);
 
-        // Validasi data yang diinput (sekarang semua menjadi nullable)
+        // Validasi data yang diinput (semua menjadi nullable)
         $request->validate([
             'cat_id' => 'nullable|exists:categories,id',
             'name' => 'nullable|string|max:255',
@@ -92,17 +92,17 @@ class ProductController extends Controller
             'price' => 'nullable|numeric',
         ]);
 
-        // Perbarui data produk, hanya jika ada input yang diterima
-        if ($request->has('cat_id')) {
+        // Perbarui data produk hanya jika field diisi
+        if ($request->filled('cat_id')) {
             $product->cat_id = $request->cat_id;
         }
-        if ($request->has('name')) {
+        if ($request->filled('name')) {
             $product->name = $request->name;
         }
-        if ($request->has('slug')) {
+        if ($request->filled('slug')) {
             $product->slug = $request->slug;
         }
-        if ($request->has('price')) {
+        if ($request->filled('price')) {
             $product->price = $request->price;
         }
 
@@ -121,9 +121,13 @@ class ProductController extends Controller
         // Simpan perubahan produk
         $product->save();
 
-        // Kembalikan respons JSON sukses
-        return response()->json(['message' => 'Produk berhasil diperbarui', 'data' => $product], 200);
+        // Kembalikan respons JSON sukses dengan data terbaru
+        return response()->json([
+            'message' => 'Produk berhasil diperbarui',
+            'data' => $product->fresh() // Mengambil data terbaru dari database
+        ], 200);
     }
+
 
 
 
