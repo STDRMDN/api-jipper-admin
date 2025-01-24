@@ -82,18 +82,29 @@ class ProductController extends Controller
         // Temukan produk berdasarkan ID
         $product = Product::findOrFail($id);
 
-        // Validasi data yang diinput
+        // Validasi data yang diinput (sekarang semua menjadi nullable)
         $request->validate([
-            'cat_id' => 'required|exists:categories,id', // Pastikan kategori ada
-            'name' => 'required|string|max:255',        // Nama produk wajib diisi
-            'slug' => 'required|string|max:255|unique:products,slug,' . $id, // Slug harus unik kecuali untuk produk ini
-            'front' => 'nullable|image',                // Front bisa kosong dan harus berupa gambar
-            'back' => 'nullable|image',                 // Back bisa kosong dan harus berupa gambar
-            'price' => 'required|numeric',              // Harga wajib diisi dan harus angka
+            'cat_id' => 'nullable|exists:categories,id',
+            'name' => 'nullable|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:products,slug,' . $id,
+            'front' => 'nullable|image',
+            'back' => 'nullable|image',
+            'price' => 'nullable|numeric',
         ]);
 
-        // Perbarui data produk, kecuali field yang kosong
-        $product->fill($request->except(['front', 'back']));
+        // Perbarui data produk, hanya jika ada input yang diterima
+        if ($request->has('cat_id')) {
+            $product->cat_id = $request->cat_id;
+        }
+        if ($request->has('name')) {
+            $product->name = $request->name;
+        }
+        if ($request->has('slug')) {
+            $product->slug = $request->slug;
+        }
+        if ($request->has('price')) {
+            $product->price = $request->price;
+        }
 
         // Jika ada file gambar 'front', simpan file
         if ($request->hasFile('front')) {
@@ -113,6 +124,7 @@ class ProductController extends Controller
         // Kembalikan respons JSON sukses
         return response()->json(['message' => 'Produk berhasil diperbarui', 'data' => $product], 200);
     }
+
 
 
 
