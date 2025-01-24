@@ -86,10 +86,10 @@ class ProductController extends Controller
 
         // Define validation rules
         $validator = Validator::make($request->all(), [
-            'cat_id' => 'required',
-            'name'   => 'required',
+            'cat_id' => 'required|exists:categories,id',  // Pastikan kategori valid
+            'name'   => 'required|string|max:255',
             'slug'   => 'required|unique:products,slug,' . $id,
-            'price'  => 'required',
+            'price'  => 'required|numeric',
             'front'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',  // Validasi file gambar, optional
             'back'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',  // Validasi file gambar, optional
         ]);
@@ -152,6 +152,7 @@ class ProductController extends Controller
             'data'    => $product,
         ], 200);
     }
+
 
 
 
