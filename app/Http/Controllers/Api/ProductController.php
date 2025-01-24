@@ -81,11 +81,14 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Debug: Log data request
+        \Log::info($request->all()); // Atau gunakan dd($request->all());
+
         // Define validation rules
         $validator = Validator::make($request->all(), [
-            'cat_id' => 'required', // Tidak wajib, tetapi harus valid jika diisi
+            'cat_id' => 'required',
             'name'   => 'required',
-            'slug'   => 'required|unique:products,slug,' . $id, // Unik jika diisi, kecuali untuk ID yang sama
+            'slug'   => 'required|unique:products,slug,' . $id,
             'price'  => 'required',
         ]);
 
@@ -147,7 +150,6 @@ class ProductController extends Controller
             'data'    => $product,
         ], 200);
     }
-
 
 
     // 10. DELETE product by id
