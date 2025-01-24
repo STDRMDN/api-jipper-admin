@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DyoResource;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -80,50 +81,73 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validasi input
+        // Define validation rules
         $validator = Validator::make($request->all(), [
             'cat_id' => 'nullable|exists:categories,id',
-            'name' => 'nullable|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:products,slug,' . $id,
-            'front' => 'nullable|image',
-            'back' => 'nullable|image',
-            'price' => 'nullable|numeric',
+            'name'   => 'nullable|string|max:255',
+            'slug'   => 'nullable|string|max:255|unique:products,slug,' . $id,
+            'price'  => 'nullable|numeric',
+            'front'  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'back'   => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Jika validasi gagal
+        // Check if validation fails
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()->all()], 422);
+            return response()->json($validator->errors(), 422);
         }
 
-        // Cari produk berdasarkan ID
+        // Find product by ID
         $product = Product::find($id);
 
-        // Jika data produk tidak ditemukan
         if (!$product) {
             return response()->json(['error' => 'Product not found!'], 404);
         }
 
-        // Siapkan data untuk diupdate
-        $updateData = $request->only(['cat_id', 'name', 'slug', 'price']);
-
-        // Simpan file gambar jika ada
+        // Check if 'front' image is provided
         if ($request->hasFile('front')) {
-            $updateData['front'] = $request->file('front')->store('product/front', 'public');
+            // Upload new 'front' image
+            $front = $request->file('front');
+            $front->storeAs('public/product/front', $front->hashName());
+
+            // Delete old 'front' image if exists
+            if ($product->front) {
+                Storage::delete('public/product/front/' . basename($product->front));
+            }
+
+            // Update product with new 'front' image
+            $product->front = 'product/front/' . $front->hashName();
         }
+
+        // Check if 'back' image is provided
         if ($request->hasFile('back')) {
-            $updateData['back'] = $request->file('back')->store('product/back', 'public');
+            // Upload new 'back' image
+            $back = $request->file('back');
+            $back->storeAs('public/product/back', $back->hashName());
+
+            // Delete old 'back' image if exists
+            if ($product->back) {
+                Storage::delete('public/product/back/' . basename($product->back));
+            }
+
+            // Update product with new 'back' image
+            $product->back = 'product/back/' . $back->hashName();
         }
 
-        // Update produk
-        $product->update($updateData);
+        // Update other fields
+        $product->update([
+            'cat_id' => $request->cat_id ?? $product->cat_id,
+            'name'   => $request->name ?? $product->name,
+            'slug'   => $request->slug ?? $product->slug,
+            'price'  => $request->price ?? $product->price,
+        ]);
 
-        // Kembalikan respons JSON sukses
-        return new DyoResource("success", "Product updated successfully", $product);
+        // Return response
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Product updated successfully!',
+            'data'    => $product,
+        ], 200);
     }
-
-
-
-
 
 
     // 10. DELETE product by id
