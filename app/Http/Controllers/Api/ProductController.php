@@ -104,35 +104,24 @@ class ProductController extends Controller
             return response()->json(['error' => 'Product not found!'], 404);
         }
 
-        // Check if 'front' image is provided
         if ($request->hasFile('front')) {
-            // Upload new 'front' image
             $front = $request->file('front');
             $front->storeAs('public/product/front', $front->hashName());
-
-            // Delete old 'front' image if exists
             if ($product->front) {
                 Storage::delete('public/product/front/' . basename($product->front));
             }
-
-            // Update product with new 'front' image
             $product->front = 'product/front/' . $front->hashName();
         }
 
-        // Check if 'back' image is provided
         if ($request->hasFile('back')) {
-            // Upload new 'back' image
             $back = $request->file('back');
             $back->storeAs('public/product/back', $back->hashName());
-
-            // Delete old 'back' image if exists
             if ($product->back) {
                 Storage::delete('public/product/back/' . basename($product->back));
             }
-
-            // Update product with new 'back' image
             $product->back = 'product/back/' . $back->hashName();
         }
+
 
         // Update other fields
         $product->cat_id = $request->cat_id ?? $product->cat_id;
