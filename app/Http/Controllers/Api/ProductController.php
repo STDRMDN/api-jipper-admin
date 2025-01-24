@@ -93,10 +93,14 @@ class ProductController extends Controller
             'front'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',  // Validasi file gambar, optional
             'back'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',  // Validasi file gambar, optional
         ]);
+        \Log::info('Request Data:', $request->all());
 
         // Check if validation fails
         if ($validator->fails()) {
-            \Log::info('Validation Errors: ', $validator->errors()->all());
+            \Log::info(
+                'Validation Errors: ',
+                $validator->errors()->all()
+            );
             return response()->json($validator->errors(), 422);
         }
 
