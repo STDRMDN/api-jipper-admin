@@ -83,13 +83,14 @@ class ProductController extends Controller
     {
         // Define validation rules
         $validator = Validator::make($request->all(), [
-            'cat_id' => 'nullable|exists:categories,id',
-            'name'   => 'nullable|string|max:255',
-            'slug'   => 'nullable|string|max:255|unique:products,slug,' . $id,
-            'price'  => 'nullable|numeric',
-            'front'  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'back'   => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'cat_id' => 'required|exists:categories,id', // Pastikan cat_id valid
+            'name'   => 'required|string|max:255',
+            'slug'   => 'required|string|unique:products,slug,' . $id, // Unik kecuali untuk produk yang sedang diperbarui
+            'price'  => 'required|numeric|min:0',
+            'front'  => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validasi file gambar
+            'back'   => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validasi file gambar
         ]);
+
 
         // Check if validation fails
         if ($validator->fails()) {
