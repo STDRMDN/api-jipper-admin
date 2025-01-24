@@ -96,6 +96,7 @@ class ProductController extends Controller
 
         // Check if validation fails
         if ($validator->fails()) {
+            \Log::info('Validation Errors: ', $validator->errors()->all());
             return response()->json($validator->errors(), 422);
         }
 
