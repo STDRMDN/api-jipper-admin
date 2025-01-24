@@ -90,7 +90,10 @@ class ProductController extends Controller
             'name'   => 'required',
             'slug'   => 'required|unique:products,slug,' . $id,
             'price'  => 'required',
+            'front'  => 'nullable|file|mimes:jpeg,png,jpg,gif',  // Validasi file gambar
+            'back'   => 'nullable|file|mimes:jpeg,png,jpg,gif',  // Validasi file gambar
         ]);
+
 
         // Check if validation fails
         if ($validator->fails()) {
