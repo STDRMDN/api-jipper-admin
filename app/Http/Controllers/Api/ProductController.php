@@ -90,10 +90,9 @@ class ProductController extends Controller
             'name'   => 'required',
             'slug'   => 'required|unique:products,slug,' . $id,
             'price'  => 'required',
-            'front'  => 'nullable|file|mimes:jpeg,png,jpg,gif',  // Validasi file gambar
-            'back'   => 'nullable|file|mimes:jpeg,png,jpg,gif',  // Validasi file gambar
+            'front'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',  // Validasi file gambar, optional
+            'back'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',  // Validasi file gambar, optional
         ]);
-
 
         // Check if validation fails
         if ($validator->fails()) {
@@ -107,24 +106,35 @@ class ProductController extends Controller
             return response()->json(['error' => 'Product not found!'], 404);
         }
 
+        // Handle 'front' image upload if provided
         if ($request->hasFile('front')) {
             $front = $request->file('front');
-            $front->storeAs('public/product/front', $front->hashName());
+            // Store the 'front' image
+            $frontPath = $front->storeAs('public/product/front', $front->hashName());
+
+            // Delete old 'front' image if exists
             if ($product->front) {
                 Storage::delete('public/product/front/' . basename($product->front));
             }
+
+            // Update the 'front' image path in the product
             $product->front = 'product/front/' . $front->hashName();
         }
 
+        // Handle 'back' image upload if provided
         if ($request->hasFile('back')) {
             $back = $request->file('back');
-            $back->storeAs('public/product/back', $back->hashName());
+            // Store the 'back' image
+            $backPath = $back->storeAs('public/product/back', $back->hashName());
+
+            // Delete old 'back' image if exists
             if ($product->back) {
                 Storage::delete('public/product/back/' . basename($product->back));
             }
+
+            // Update the 'back' image path in the product
             $product->back = 'product/back/' . $back->hashName();
         }
-
 
         // Update other fields
         $product->cat_id = $request->cat_id ?? $product->cat_id;
@@ -142,6 +152,7 @@ class ProductController extends Controller
             'data'    => $product,
         ], 200);
     }
+
 
 
     // 10. DELETE product by id
