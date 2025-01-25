@@ -80,83 +80,84 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        // Debug: Log data request
-        \Log::info($request->all()); // Atau gunakan dd($request->all());
+{
+    // Debug: Log data request
+    \Log::info($request->all()); // Atau gunakan dd($request->all());
 
-        // Define validation rules
-        $validator = Validator::make($request->all(), [
-            'cat_id' => 'required|exists:categories,id',  // Pastikan kategori valid
-            'name'   => 'required|string|max:255',
-            'slug'   => 'required|unique:products,slug,' . $id,
-            'price'  => 'required|numeric',
-            'front'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',  // Validasi file gambar, optional
-            'back'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',  // Validasi file gambar, optional
-        ]);
-        \Log::info('Request Data:', $request->all());
+    // Define validation rules with optional fields
+    $validator = Validator::make($request->all(), [
+        'cat_id' => 'nullable|exists:categories,id',  // Kategori tidak wajib, hanya jika ada
+        'name'   => 'nullable|string|max:255',        // Nama tidak wajib, hanya jika ada
+        'slug'   => 'nullable|unique:products,slug,' . $id,  // Slug tidak wajib, hanya jika ada dan unik
+        'price'  => 'nullable|numeric',               // Harga tidak wajib, hanya jika ada
+        'front'  => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',  // Validasi file gambar, optional
+        'back'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',  // Validasi file gambar, optional
+    ]);
+    \Log::info('Request Data:', $request->all());
 
-        // Check if validation fails
-        if ($validator->fails()) {
-            \Log::info(
-                'Validation Errors: ',
-                $validator->errors()->all()
-            );
-            return response()->json($validator->errors(), 422);
-        }
-
-        // Find product by ID
-        $product = Product::find($id);
-
-        if (!$product) {
-            return response()->json(['error' => 'Product not found!'], 404);
-        }
-
-        // Handle 'front' image upload if provided
-        if ($request->hasFile('front')) {
-            $front = $request->file('front');
-            // Store the 'front' image
-            $frontPath = $front->storeAs('public/product/front', $front->hashName());
-
-            // Delete old 'front' image if exists
-            if ($product->front) {
-                Storage::delete('public/product/front/' . basename($product->front));
-            }
-
-            // Update the 'front' image path in the product
-            $product->front = 'product/front/' . $front->hashName();
-        }
-
-        // Handle 'back' image upload if provided
-        if ($request->hasFile('back')) {
-            $back = $request->file('back');
-            // Store the 'back' image
-            $backPath = $back->storeAs('public/product/back', $back->hashName());
-
-            // Delete old 'back' image if exists
-            if ($product->back) {
-                Storage::delete('public/product/back/' . basename($product->back));
-            }
-
-            // Update the 'back' image path in the product
-            $product->back = 'product/back/' . $back->hashName();
-        }
-
-        // Update other fields
-        $product->cat_id = $request->cat_id ?? $product->cat_id;
-        $product->name   = $request->name ?? $product->name;
-        $product->slug   = $request->slug ?? $product->slug;
-        $product->price  = $request->price ?? $product->price;
-
-        // Save the updated product
-        $product->save();
-
-        // Return response
-        return response()->json([
-            'status'  => 'success',
-            'message' => 'Product updated successfully!',
-            'data'    => $product,
-        ], 200);
+    // Check if validation fails
+    if ($validator->fails()) {
+        \Log::info(
+            'Validation Errors: ',
+            $validator->errors()->all()
+        );
+        return response()->json($validator->errors(), 422);
     }
+
+    // Find product by ID
+    $product = Product::find($id);
+
+    if (!$product) {
+        return response()->json(['error' => 'Product not found!'], 404);
+    }
+
+    // Handle 'front' image upload if provided
+    if ($request->hasFile('front')) {
+        $front = $request->file('front');
+        // Store the 'front' image
+        $frontPath = $front->storeAs('public/product/front', $front->hashName());
+
+        // Delete old 'front' image if exists
+        if ($product->front) {
+            Storage::delete('public/product/front/' . basename($product->front));
+        }
+
+        // Update the 'front' image path in the product
+        $product->front = 'product/front/' . $front->hashName();
+    }
+
+    // Handle 'back' image upload if provided
+    if ($request->hasFile('back')) {
+        $back = $request->file('back');
+        // Store the 'back' image
+        $backPath = $back->storeAs('public/product/back', $back->hashName());
+
+        // Delete old 'back' image if exists
+        if ($product->back) {
+            Storage::delete('public/product/back/' . basename($product->back));
+        }
+
+        // Update the 'back' image path in the product
+        $product->back = 'product/back/' . $back->hashName();
+    }
+
+    // Update other fields if they are present in the request
+    $product->cat_id = $request->cat_id ?? $product->cat_id;
+    $product->name   = $request->name ?? $product->name;
+    $product->slug   = $request->slug ?? $product->slug;
+    $product->price  = $request->price ?? $product->price;
+
+    // Save the updated product
+    $product->save();
+
+    // Return response
+    return response()->json([
+        'status'  => 'success',
+        'message' => 'Product updated successfully!',
+        'data'    => $product,
+    ], 200);
+}
+
 
 
 
