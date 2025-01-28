@@ -27,7 +27,7 @@ class CheckoutController extends Controller
 
     public function show($id)
     {
-        $order = Order::with(['productOrders', 'payment', 'dyo'])->findOrFail($id);
+        $order = Order::with(['productOrders', 'payment', 'dyo.attachments', 'dyo.attachmentRefs'])->findOrFail($id);
 
         // Resource tanpa total data
         return new DyoResource("success", "Order details", $order);
