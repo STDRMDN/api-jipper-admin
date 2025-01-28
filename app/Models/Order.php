@@ -20,4 +20,9 @@ class Order extends Model
     {
         return $this->hasOne(PaymentApproval::class, 'id_order');
     }
+
+    public function dyo()
+    {
+        return $this->hasOne(Dyo::class, 'id');
+    }
 }
