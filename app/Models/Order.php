@@ -23,6 +23,6 @@ class Order extends Model
 
     public function dyo()
     {
-        return $this->hasOne(Dyo::class, 'id');
+        return $this->belongsTo(Dyo::class, 'id_dyo');
     }
 }
